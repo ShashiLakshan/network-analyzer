@@ -13,6 +13,7 @@ This Java application is designed to monitor a configurable directory for newly 
 - Output Reporting: Writes the list of top domains along with their connection counts to a .txt file, updating it at regular 1-minute intervals.
 
 ## Sequence Diagram
+```mermaid
 sequenceDiagram
     participant Main
     participant ConfigLoader
@@ -24,41 +25,48 @@ sequenceDiagram
     participant FileSystem
 
     Main->>ConfigLoader: new ConfigLoader(configPath)
-    ConfigLoader-->>Main: configLoader
+    ConfigLoader-->>Main: ConfigLoader instance
+
     Main->>ConfigLoader: getWatchDirectory()
     ConfigLoader-->>Main: watchDir
+
     Main->>ConfigLoader: getOutputDirectory()
     ConfigLoader-->>Main: outputDir
 
     Main->>Parser: new CSVParser()
-    Parser-->>Main: parser
+    Parser-->>Main: Parser instance
+
     Main->>FileHandler: new CsvFileHandler()
-    FileHandler-->>Main: fileHandler
+    FileHandler-->>Main: FileHandler instance
+
     Main->>Aggregator: new AggregatorImpl(outputDir)
-    Aggregator-->>Main: aggregator
+    Aggregator-->>Main: Aggregator instance
 
     Main->>DirectoryWatcher: new DirectoryWatcher(watchDir, fileHandler, parser, aggregator)
-    DirectoryWatcher-->>Main: watcher
+    DirectoryWatcher-->>Main: DirectoryWatcher instance
+
     Main->>DirectoryWatcher: start()
 
     DirectoryWatcher->>FileSystem: register(watchDir, ENTRY_CREATE)
 
     loop Monitor Directory
-        FileSystem->>DirectoryWatcher: fileCreated(filePath)
+        FileSystem-->>DirectoryWatcher: fileCreated(filePath)
         DirectoryWatcher->>FileHandler: handleNewFile(filePath, parser, aggregator)
         FileHandler->>FileUtils: waitForFileToBeStable(filePath)
-        FileUtils-->>FileHandler: isStable
+        FileUtils-->>FileHandler: true/false (isStable)
 
         alt File is stable
             FileHandler->>Parser: parseAndDeduplicate(filePath)
             Parser->>FileSystem: read(filePath)
             FileSystem-->>Parser: fileContent
-            Parser-->>FileHandler: records
+            Parser-->>FileHandler: List<NetworkRecord>
             FileHandler->>Aggregator: addBatch(records)
         end
     end
 
     loop Every minute
         Aggregator->>Aggregator: flushTopDomains()
-        Aggregator->>FileSystem: write(topDomainsFile)
+        Aggregator->>FileSystem: write(topDomains.txt)
     end
+
+```
