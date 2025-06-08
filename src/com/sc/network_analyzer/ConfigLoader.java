@@ -17,6 +17,14 @@ public class ConfigLoader {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load config: " + filePath, e);
         }
+
+        // Validate required properties
+        if (properties.getProperty(WATCH_DIRECTORY) == null || properties.getProperty(WATCH_DIRECTORY).isBlank()) {
+            throw new RuntimeException("Missing required property: " + WATCH_DIRECTORY);
+        }
+        if (properties.getProperty(OUTPUT_DIRECTORY) == null || properties.getProperty(OUTPUT_DIRECTORY).isBlank()) {
+            throw new RuntimeException("Missing required property: " + OUTPUT_DIRECTORY);
+        }
     }
 
     public String getWatchDirectory() {
