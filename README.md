@@ -43,7 +43,7 @@ Example:
 1708867200000,192.168.1.10,5000,10.0.0.5,53,example.com
 ```
 
-## Basic commands to run the application 
+## Basic commands to run the application from the root folder
 1. Compile the soruce code
    ```
    javac -d out -sourcepath src src/com/sc/network_analyzer/Main.java
