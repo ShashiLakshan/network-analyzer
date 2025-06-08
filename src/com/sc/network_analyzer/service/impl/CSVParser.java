@@ -10,6 +10,11 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * CSVParser is responsible for parsing a CSV file containing network connection logs.
+ * It reads the file, converts each valid line into a NetworkRecord,
+ * and eliminates duplicate records using a HashSet.
+ */
 public class CSVParser implements Parser {
     @Override
     public Set<NetworkRecord> parseAndDeduplicate(Path filePath) {

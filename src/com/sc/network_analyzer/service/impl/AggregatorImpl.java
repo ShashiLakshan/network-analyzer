@@ -14,17 +14,29 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * AggregatorImpl collects incoming network records and periodically (every minute)
+ * aggregates the top 10 most frequent domains, writing them to a timestamped text file.
+ */
 public class AggregatorImpl implements Aggregator {
 
+    // Thread-safe buffer to hold records until aggregation
     private final List<NetworkRecord> buffer = Collections.synchronizedList(new ArrayList<>());
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final String outputDir;
 
     public AggregatorImpl(String outputDir) {
         this.outputDir = outputDir;
+        // Schedule flushTopDomains() to run every 1 minute
         scheduler.scheduleAtFixedRate(this::flushTopDomains, 1, 1, TimeUnit.MINUTES);
     }
 
+    /**
+     * Adds a new batch of network records to the buffer.
+     * Called each time a file is parsed successfully.
+     *
+     * @param records deduplicated records from the parser
+     */
     @Override
     public void addBatch(Set<NetworkRecord> records) {
         buffer.addAll(records);
@@ -33,9 +45,11 @@ public class AggregatorImpl implements Aggregator {
     private void flushTopDomains() {
         Map<String, Long> domainCounts;
 
+        // Synchronize access to the buffer to avoid race conditions
         synchronized (buffer) {
             domainCounts = buffer.stream()
                     .collect(Collectors.groupingBy(NetworkRecord::getDomain, Collectors.counting()));
+            // Clear buffer after aggregation
             buffer.clear();
         }
 
