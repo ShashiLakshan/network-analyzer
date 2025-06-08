@@ -45,10 +45,14 @@ Example:
 
 ## Basic commands to run the application 
 1. Compile the soruce code
-   - javac -d out -sourcepath src src/com/sc/network_analyzer/Main.java
+   ```
+   javac -d out -sourcepath src src/com/sc/network_analyzer/Main.java
+   ```
 
-2. Run the Application
+3. Run the Application
+   ```
    - java -cp out com.sc.network_analyzer.Main
+     ```
 
 
 ## Sequence Diagram
