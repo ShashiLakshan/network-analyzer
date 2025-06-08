@@ -51,7 +51,7 @@ Example:
 
 3. Run the Application
    ```
-   - java -cp out com.sc.network_analyzer.Main
+    java -cp out com.sc.network_analyzer.Main
      ```
 
 
